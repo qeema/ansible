@@ -1,0 +1,35 @@
+- name: Configure rails webserver
+  hosts: webserver
+  become: True
+  tasks:
+    - name: install git
+      yum : name=git
+
+    - name: install tmux
+      yum : name=tmux
+
+    - yum: name={{item}} state=latest
+      with_items:
+        - wget
+        - gcc
+        - gcc-c++
+        - make
+        - openssl-devel
+        - zlib-devel
+        - readline-devel
+        - sqlite-devel
+
+    # Rubyをダウンロードして解凍してインストールする
+    - get_url: >
+        url=http://core.ring.gr.jp/pub/lang/ruby/ruby-2.3-stable.tar.gz 
+        dest=/usr/local/src/
+    - unarchive: >
+        src=/usr/local/src/ruby-2.3-stable.tar.gz dest=/usr/local/src/
+        creates=/usr/local/src/ruby-2.3-stable
+    - shell: >
+        ./configure --with-opt-dir=/usr/local --enable-shared --enable-option-checking &&
+        make &&
+        make test &&
+        make install
+        chdir=/usr/local/src/ruby-2.3.1
+        creates=/usr/local/bin/ruby
