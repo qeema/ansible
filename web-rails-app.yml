@@ -8,6 +8,14 @@
     - name: install tmux
       yum : name=tmux
 
+    - name : set locale lang
+      shell: |
+        localectl set-locale LANG=ja_JP.utf8
+        source /etc/locale.conf
+    
+    - name : set timezone
+      shell: timedatectl set-timezone Asia/Tokyo
+
     - yum: name={{item}} state=latest
       with_items:
         - wget
@@ -19,7 +27,7 @@
         - readline-devel
         - sqlite-devel
 
-    # Rubyをダウンロードして解凍してインストールする
+    # install ruby
     - get_url: >
         url=http://core.ring.gr.jp/pub/lang/ruby/ruby-2.3-stable.tar.gz 
         dest=/usr/local/src/
@@ -33,3 +41,12 @@
         make install
         chdir=/usr/local/src/ruby-2.3.1
         creates=/usr/local/bin/ruby
+
+    # install rails
+    - name: Install rails
+      gem:
+        name      : rails
+        version   : 4.2.7
+        state     : present
+        executable: /usr/local/bin/gem
+

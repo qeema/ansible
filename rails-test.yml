@@ -1,0 +1,17 @@
+- name: Configure rails webserver
+  hosts: webserver
+  become: True
+  tasks:
+    - name: install git
+      yum : name=git
+
+    - name: install tmux
+      yum : name=tmux
+  
+
+    - name: Install rails
+      gem:
+        name: rails
+        version: 4.2.7
+        state: present
+        executable: /usr/local/bin/gem
