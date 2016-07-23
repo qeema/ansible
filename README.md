@@ -8,6 +8,7 @@ Ansibleによるrails環境の作成
 ## Requirement
 - CentOS  7.1+
 - Ansible 2.0+
+-- yum install ansible --enablerepo=epel-testing -y
 
 ## Usage
 1. ansible実行サーバーと対象サーバー二台を準備(以下virtualbox+vagrantを想定)
