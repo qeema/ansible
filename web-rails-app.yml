@@ -30,13 +30,20 @@
         - readline-devel
         - sqlite-devel
 
+    # set project app
+    - file: path=/vagrant/rails_project state=directory owner=root group=root mode=0755
+    - git:
+        repo: https://github.com/qeema/accounting.git
+        dest: /vagrant/rails_project
+        version: develop
+        clone: yes
+        update: yes
+
     # install ruby
     - get_url: >
         url=http://core.ring.gr.jp/pub/lang/ruby/ruby-2.3-stable.tar.gz 
         dest=/usr/local/src/
-    - unarchive: >
-        src=/usr/local/src/ruby-2.3-stable.tar.gz dest=/usr/local/src/
-        creates=/usr/local/src/ruby-2.3-stable
+    - command: tar zxvf /usr/local/src/ruby-2.3-stable.tar.gz chdir=/usr/local/src
     - shell: >
         ./configure --with-opt-dir=/usr/local --enable-shared --enable-option-checking &&
         make &&
