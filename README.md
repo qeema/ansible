@@ -30,7 +30,3 @@ $ ansible-playbook web-rails-app.yml
 $ ansible webserver -m ping
 - playbook実行時のデバッグで詳細が見たい
 $ ansible-playbook web-rails-app.yml -vvvv
-
-
-
-
