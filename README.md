@@ -19,9 +19,11 @@ ansible対象のサーバーの鍵に変更 ex./vagrant/.vagrant/machines/defaul
 ansible_ssh_hostをansible当てたいサーバーのIPアドレスに指定する
 5. ansible.cfg
 remote_userを対象サーバのユーザー名に変更(デフォルトはvagrant)
-6. 実行サーバー
+6.web-rails-app.yml
+varsのproject_dir => ローカルのrailsプロジェクトディレクトリ
+7. 実行サーバー
 $ ansible-playbook web-rails-app.yml
-7. failedが出なければ完成。rubyインストールなので結構遅い
+8. failedが出なければ完成。rubyインストールなので結構遅い
 
 ## その他
 - 疎通の確認がしたい→成功時はponggが返ってくる

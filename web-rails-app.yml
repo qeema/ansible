@@ -1,6 +1,8 @@
 - name: Configure rails webserver
   hosts: webserver
   become: True
+  vars:
+    - project_dir: "/vagrant/perfect_rails"
   tasks:
     - name: install git
       yum : name=git
@@ -22,6 +24,7 @@
     - yum: name={{item}} state=latest
       with_items:
         - wget
+        - unzip
         - gcc
         - gcc-c++
         - make
@@ -31,10 +34,10 @@
         - sqlite-devel
 
     # set project app
-    - file: path=/vagrant/rails_project state=directory owner=root group=root mode=0755
+    - file: path="{{ project_dir }}" state=directory owner=root group=root mode=0755
     - git:
         repo: https://github.com/qeema/accounting.git
-        dest: /vagrant/rails_project
+        dest: "{{ project_dir }}"
         version: develop
         clone: yes
         update: yes
@@ -157,6 +160,34 @@
     - name: Install therubyracer
       gem:
         name        : therubyracer
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install pry rails
+      gem:
+        name        : pry-rails
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install pry byebye bug
+      gem:
+        name        : pry-byebug
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install hirb
+      gem:
+        name        : hirb
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install hirb-uni
+      gem:
+        name        : hirb-unicode
         state       : latest
         executable  : /usr/local/bin/gem
         user_install: no
