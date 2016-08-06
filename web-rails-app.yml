@@ -160,3 +160,10 @@
         state       : latest
         executable  : /usr/local/bin/gem
         user_install: no
+
+    - name: Install pry
+      gem:
+        name        : pry-rails
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
