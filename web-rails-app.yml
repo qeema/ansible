@@ -1,6 +1,8 @@
 - name: Configure rails webserver
   hosts: webserver
   become: True
+  vars:
+    - project_dir: "/vagrant/perfect_rails"
   tasks:
     - name: install git
       yum : name=git
@@ -32,10 +34,10 @@
         - sqlite-devel
 
     # set project app
-    - file: path=/vagrant/rails_project state=directory owner=root group=root mode=0755
+    - file: path="{{ project_dir }}" state=directory owner=root group=root mode=0755
     - git:
         repo: https://github.com/qeema/accounting.git
-        dest: /vagrant/rails_project
+        dest: "{{ project_dir }}"
         version: develop
         clone: yes
         update: yes
