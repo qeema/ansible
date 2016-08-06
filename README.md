@@ -13,17 +13,17 @@ Ansibleによるrails環境の作成
 ## Usage
 1. ansible実行サーバーと対象サーバー二台を準備(以下virtualbox+vagrantを想定)
 2. 実行サーバーより、本リポジトリをcloneして下記ファイルを変更する
-3. praivete.key
-ansible対象のサーバーの鍵に変更 ex./vagrant/.vagrant/machines/default/virtualbox/private_key
-4. hosts
-ansible_ssh_hostをansible当てたいサーバーのIPアドレスに指定する
-5. ansible.cfg
-remote_userを対象サーバのユーザー名に変更(デフォルトはvagrant)
-6.web-rails-app.yml
-varsのproject_dir => ローカルのrailsプロジェクトディレクトリ
-7. 実行サーバー
+- praivete.key
+-- ansible対象のサーバーの鍵に変更 ex./vagrant/.vagrant/machines/default/virtualbox/private_key
+- hosts
+-- ansible_ssh_hostをansible当てたいサーバーのIPアドレスに指定する
+- ansible.cfg
+-- remote_userを対象サーバのユーザー名に変更(デフォルトはvagrant)
+- web-rails-app.yml
+-- varsのproject_dir => ローカルのrailsプロジェクトディレクトリ
+3. 実行サーバー
 $ ansible-playbook web-rails-app.yml
-8. failedが出なければ完成。rubyインストールなので結構遅い
+4. failedが出なければ完成。rubyインストールなので結構遅い
 
 ## その他
 - 疎通の確認がしたい→成功時はponggが返ってくる
