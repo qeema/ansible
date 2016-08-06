@@ -1,0 +1,9 @@
+# 最小構成テスト
+# command : ansible-playbook git-install-test.yml
+
+- name: Test git install
+  hosts: webserver
+  become: True
+  tasks:
+    - name: install git
+      yum : name=git

@@ -1,0 +1,162 @@
+- name: Configure rails webserver
+  hosts: webserver
+  become: True
+  tasks:
+    - name: install git
+      yum : name=git
+
+    - name: install tmux
+      yum : name=tmux
+
+    - name: install node.js
+      yum : name=nodejs
+
+    - name : set locale lang
+      shell: |
+        localectl set-locale LANG=ja_JP.utf8
+        source /etc/locale.conf
+    
+    - name : set timezone
+      shell: timedatectl set-timezone Asia/Tokyo
+
+    - yum: name={{item}} state=latest
+      with_items:
+        - wget
+        - gcc
+        - gcc-c++
+        - make
+        - openssl-devel
+        - zlib-devel
+        - readline-devel
+        - sqlite-devel
+
+    # set project app
+    - file: path=/vagrant/rails_project state=directory owner=root group=root mode=0755
+    - git:
+        repo: https://github.com/qeema/accounting.git
+        dest: /vagrant/rails_project
+        version: develop
+        clone: yes
+        update: yes
+
+    # install ruby
+    - get_url: >
+        url=http://core.ring.gr.jp/pub/lang/ruby/ruby-2.3-stable.tar.gz 
+        dest=/usr/local/src/
+    - command: tar zxvf /usr/local/src/ruby-2.3-stable.tar.gz chdir=/usr/local/src
+    - shell: >
+        ./configure --with-opt-dir=/usr/local --enable-shared --enable-option-checking &&
+        make &&
+        make test &&
+        make install
+        chdir=/usr/local/src/ruby-2.3.1
+        creates=/usr/local/bin/ruby
+
+    # install rails
+    - name: Install rails
+      gem:
+        name        : rails
+        version     : 4.2.7
+        state       : present
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install sqlite3
+      gem:
+        name        : sqlite3
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install bundler
+      gem:
+        name        : bundler
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install sass-rails
+      gem:
+        name        : sass-rails
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install uglifier
+      gem:
+        name        : uglifier
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install coffee-rails
+      gem:
+        name        : coffee-rails
+        version     : 4.1.0
+        state       : present
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install jquery-rails
+      gem:
+        name        : jquery-rails
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install turbolinks
+      gem:
+        name        : turbolinks
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install sdoc
+      gem:
+        name        : sdoc
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install unicorn
+      gem:
+        name        : unicorn
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install byebug
+      gem:
+        name        : byebug
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install web-console
+      gem:
+        name        : web-console
+        version     : 2.0
+        state       : present
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install spring
+      gem:
+        name        : spring
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install jbuilder
+      gem:
+        name        : jbuilder
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install therubyracer
+      gem:
+        name        : therubyracer
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
