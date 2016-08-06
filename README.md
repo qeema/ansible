@@ -1,5 +1,5 @@
 # Build ruby env by Ansible
-Ansibleによるrails環境の作成
+Ansibleによるrails環境の作成-
 
 ## Description
 - CentOSサーバーに対してrails環境を構築する
@@ -21,12 +21,12 @@ Ansibleによるrails環境の作成
 -- remote_userを対象サーバのユーザー名に変更(デフォルトはvagrant)
 - web-rails-app.yml
 -- varsのproject_dir => ローカルのrailsプロジェクトディレクトリ
-3. 実行サーバー
-$ ansible-playbook web-rails-app.yml
+3. 実行サーバーにてansibleコマンド実行
+`$ ansible-playbook web-rails-app.yml`
 4. failedが出なければ完成。rubyインストールなので結構遅い
 
 ## その他
 - 疎通の確認がしたい→成功時はponggが返ってくる
-$ ansible webserver -m ping
+`$ ansible webserver -m ping`
 - playbook実行時のデバッグで詳細が見たい
-$ ansible-playbook web-rails-app.yml -vvvv
+`$ ansible-playbook web-rails-app.yml -vvvv`
