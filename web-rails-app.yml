@@ -22,6 +22,7 @@
     - yum: name={{item}} state=latest
       with_items:
         - wget
+        - unzip
         - gcc
         - gcc-c++
         - make
@@ -161,9 +162,30 @@
         executable  : /usr/local/bin/gem
         user_install: no
 
-    - name: Install pry
+    - name: Install pry rails
       gem:
         name        : pry-rails
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install pry byebye bug
+      gem:
+        name        : pry-byebug
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install hirb
+      gem:
+        name        : hirb
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install hirb-uni
+      gem:
+        name        : hirb-unicode
         state       : latest
         executable  : /usr/local/bin/gem
         user_install: no
