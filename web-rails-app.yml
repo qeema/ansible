@@ -2,7 +2,7 @@
   hosts: webserver
   become: True
   vars:
-    - project_dir: "/vagrant/perfect_rails"
+    - project_dir: "/vagrant/rails_projects"
   tasks:
     - name: install git
       yum : name=git
