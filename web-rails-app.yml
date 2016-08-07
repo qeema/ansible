@@ -2,7 +2,8 @@
   hosts: webserver
   become: True
   vars:
-    - project_dir: "/vagrant/perfect_rails"
+    - project_dir: "/vagrant/rails_projects"
+    - project_repo: "https://github.com/qeema/rails_projects.git"
   tasks:
     - name: install git
       yum : name=git
@@ -36,7 +37,7 @@
     # set project app
     - file: path="{{ project_dir }}" state=directory owner=root group=root mode=0755
     - git:
-        repo: https://github.com/qeema/accounting.git
+        repo: "{{ project_repo }}"
         dest: "{{ project_dir }}"
         version: develop
         clone: yes
