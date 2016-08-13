@@ -33,6 +33,11 @@
         - zlib-devel
         - readline-devel
         - sqlite-devel
+        - ruby-devel
+        - mysql
+        - mysql-devel
+        - mysql-server
+        - mysql-utilities
 
     # set default shell
     - name: install zsh
@@ -196,6 +201,13 @@
     - name: Install hirb-uni
       gem:
         name        : hirb-unicode
+        state       : latest
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install mysql2
+      gem:
+        name        : mysql2
         state       : latest
         executable  : /usr/local/bin/gem
         user_install: no
