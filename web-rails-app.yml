@@ -5,8 +5,6 @@
   vars:
     - project_dir:       "/vagrant/rails_projects"
     - project_repo:      "https://github.com/qeema/rails_projects.git"
-    - db_passwd_root:    "test"
-    - db_password_root:  "test"
     - mysql_root_passwd: "g34q23t9u@gwea"
 
   tasks:
@@ -74,9 +72,9 @@
 #      when: root_check.stderr.find('denied') == -1
 
     # install nginx
-#    - name : add nginx repo
-#      shell: |
-#            rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+    - name : add nginx repo
+      shell: |
+            rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
             #creates= /etc/yum.repos.d/nginx.repo
   
     - name: install nginx
@@ -107,6 +105,22 @@
         executable  : /usr/local/bin/gem
         user_install: no
 
+    - name: Install coffee-rails
+      gem:
+        name        : coffee-rails
+        version     : 4.1.0
+        state       : present
+        executable  : /usr/local/bin/gem
+        user_install: no
+
+    - name: Install web-console
+      gem:
+        name        : web-console
+        version     : 2.0
+        state       : present
+        executable  : /usr/local/bin/gem
+        user_install: no
+
     - name: install gems
       gem : name={{item}} state=latest user_install=no executable=/usr/local/bin/gem
       with_items: 
@@ -114,13 +128,11 @@
         - bundler
         - sass-rails
         - uglifier
-        - coffee-rails
         - jquery-rails
         - turbolinks
         - sdoc
         - unicorn
         - byebug
-        - web-console
         - spring
         - jbuilder
         - therubyracer
