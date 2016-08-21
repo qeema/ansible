@@ -52,6 +52,7 @@
         - mysql-community-common
         - mysql-community-libs
         - mysql-community-libs-compat
+        - mysql-devel
 
     - name   : start server
       service: name=mysqld state=started enabled=yes
@@ -142,6 +143,7 @@
         - pry-byebug
         - hirb
         - hirb-unicode
+        - mysql2
 
     # set project app
     - file: path="{{ project_dir }}" state=directory owner=root group=root mode=0755
