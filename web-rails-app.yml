@@ -1,15 +1,16 @@
-- name: Configure rails webserver
-  hosts: webserver
+---
+- name  : Configure Rails Webserver
+  hosts : webserver
   become: True
 
-  vars:
-    - project_dir:       "/vagrant/rails_projects"
-    - project_repo:      "https://github.com/qeema/rails_projects.git"
-    - mysql_root_passwd: "g34q23t9u@gwea"
-    - rails_production_pass: "testteak389@5k93lpdfae"
+  # ansible vars = "{{ foo }}"
+  vars_files:
+    -  group_vars/conf.yml
 
+  # set up ansible tasks
   tasks:
 
+    # set up required env
     - name : set locale lang
       shell: |
         localectl set-locale LANG=ja_JP.utf8
@@ -18,7 +19,7 @@
     - name : set timezone
       shell: timedatectl set-timezone Asia/Tokyo
 
-    - name: install iroiro 
+    - name: install softs 
       yum : name={{item}} state=latest
       with_items:
         - wget
@@ -39,12 +40,13 @@
     - name : set default shell
       shell: chsh -s '/bin/zsh' root
 
+    # set up mysql
     - name : add mysql repo
       shell: |
             rpm -ih http://dev.mysql.com/get/mysql57-community-release-el7-7.noarch.rpm
             creates=/etc/yum.repos.d/mysql-community.repo
 
-    - name: ins mysql
+    - name: install mysql
       yum : name={{item}} state=present enablerepo=mysql56-community
       with_items:
         - mysql-community-server
@@ -53,45 +55,35 @@
         - mysql-community-libs
         - mysql-community-libs-compat
         - mysql-devel
+        - MySQL-python
 
     - name   : start server
       service: name=mysqld state=started enabled=yes
 
-    - name: install mysql-python
-      yum: name=MySQL-python state=present
-
+    # TODO  should use secure_instalation
     - name    : first root password
       shell   : cat /var/log/mysqld.log | grep password | awk '{ print $NF }' | head -n 1
       register: mysql_passwd
- 
-#TODO cui security error. have to improve  
-#    - name: check mysql root password
-#      command  : mysqlshow -uroot -p'{{ mysql_passwd.stdout }}'
-#      register : root_check
-#      ignore_errors: True
 
-#    - name: set mysql root password
-#      command: mysql --connect-expired-password -uroot -p'{{ mysql_passwd.stdout }}' -e "set password for root@'localhost' = PASSWORD('{{ mysql_root_passwd }}')"
-#      when: root_check.stderr.find('denied') == -1
-
-    # install nginx
+    # set up nginx
     - name : add nginx repo
       shell: |
             rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
-            #creates= /etc/yum.repos.d/nginx.repo
   
     - name: install nginx
       yum : name=nginx state=latest
 
-    # install ruby
+    # set up ruby
     - name: get ruby url
       get_url: >
         url=http://core.ring.gr.jp/pub/lang/ruby/ruby-2.3-stable.tar.gz 
         dest=/usr/local/src/
 
-    - command: tar zxvf /usr/local/src/ruby-2.3-stable.tar.gz chdir=/usr/local/src
+    - name   : extract ruby tar  
+      command: tar zxvf /usr/local/src/ruby-2.3-stable.tar.gz chdir=/usr/local/src
 
-    - shell: >
+    - name : install ruby
+      shell: >
         ./configure --with-opt-dir=/usr/local --enable-shared --enable-option-checking &&
         make &&
         make test &&
@@ -99,8 +91,9 @@
         chdir=/usr/local/src/ruby-2.3.1
         creates=/usr/local/bin/ruby
 
-    # install rails
-    - name: Install rails
+    # set up rails
+    # specify version
+    - name: install rails
       gem :
         name        : rails
         version     : 4.2.7
@@ -108,7 +101,7 @@
         executable  : /usr/local/bin/gem
         user_install: no
 
-    - name: Install coffee-rails
+    - name: install coffee-rails
       gem:
         name        : coffee-rails
         version     : 4.1.0
@@ -116,7 +109,7 @@
         executable  : /usr/local/bin/gem
         user_install: no
 
-    - name: Install web-console
+    - name: install web-console
       gem:
         name        : web-console
         version     : 2.0
@@ -124,6 +117,7 @@
         executable  : /usr/local/bin/gem
         user_install: no
 
+    # install latest gems
     - name: install gems
       gem : name={{item}} state=latest user_install=no executable=/usr/local/bin/gem
       with_items: 

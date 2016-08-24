@@ -1,0 +1,5 @@
+project_name: "rails_projects"
+project_dir: "/vagrant/rails_projects"
+project_repo: "https://github.com/qeema/rails_projects.git"
+mysql_root_passwd: "g34q23t9u@gwea"
+rails_production_pass: "testteak389@5k93lpdfae"

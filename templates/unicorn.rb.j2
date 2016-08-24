@@ -1,0 +1,10 @@
+worker_processes = 2
+working_directory "{{ project_dir }}"
+
+listen "/var/run/unicorn/unicorn_{{ project_name }}.sock"
+pid "/var/run/unicorn/unicorn_{{ project_name }}.pid"
+
+stderr_path "{{ project_dir }}/log/unicorn.stderr.log"
+stdout_path "{{ project_dir }}/log/unicorn.stdout.log"
+
+preload_app true
