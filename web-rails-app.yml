@@ -77,10 +77,10 @@
     - name: get ruby url
       get_url: >
         url=http://core.ring.gr.jp/pub/lang/ruby/ruby-2.3-stable.tar.gz 
-        dest=/usr/local/src/
+        dest="{{ src_dir }}"
 
     - name   : extract ruby tar  
-      command: tar zxvf /usr/local/src/ruby-2.3-stable.tar.gz chdir=/usr/local/src
+      command: tar zxvf "{{ src_dir }}"/ruby-2.3-stable.tar.gz chdir="{{ src_dir }}"
 
     - name : install ruby
       shell: >
@@ -88,38 +88,23 @@
         make &&
         make test &&
         make install
-        chdir=/usr/local/src/ruby-2.3.1
-        creates=/usr/local/bin/ruby
+        chdir="{{ src_dir }}"/ruby-2.3.1
+        creates="{{ ruby_com_path }}"/ruby
 
     # set up rails
     # specify version
     - name: install rails
-      gem :
-        name        : rails
-        version     : 4.2.7
-        state       : present
-        executable  : /usr/local/bin/gem
-        user_install: no
+      gem : name=rails version=4.2.7 state=present executable="{{ ruby_com_path }}"/gem user_install=no
 
     - name: install coffee-rails
-      gem:
-        name        : coffee-rails
-        version     : 4.1.0
-        state       : present
-        executable  : /usr/local/bin/gem
-        user_install: no
+      gem : name=coffee-rails version=4.1.0 state=present executable="{{ ruby_com_path }}"/gem user_install=no
 
     - name: install web-console
-      gem:
-        name        : web-console
-        version     : 2.0
-        state       : present
-        executable  : /usr/local/bin/gem
-        user_install: no
+      gem : name=web-console version=2.0 state=present executable="{{ ruby_com_path }}"/gem user_install=no
 
     # install latest gems
     - name: install gems
-      gem : name={{item}} state=latest user_install=no executable=/usr/local/bin/gem
+      gem : name={{item}} state=latest user_install=no executable="{{ ruby_com_path }}"/gem
       with_items: 
         - sqlite3
         - bundler
