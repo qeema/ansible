@@ -91,7 +91,6 @@
         chdir=/usr/local/src/ruby-2.3.1 
         creates=/usr/local/bin/ruby
 
-
     # set up rails
     # specify version
     - name: install rails
@@ -139,5 +138,3 @@
         - hirb
         - hirb-unicode
         - mysql2
-
-
