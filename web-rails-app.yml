@@ -68,43 +68,59 @@
     # set up nginx
     - name : add nginx repo
       shell: |
-            rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
-  
-    - name: install nginx
-      yum : name=nginx state=latest
+        rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
 
     # set up ruby
     - name: get ruby url
       get_url: >
         url=http://core.ring.gr.jp/pub/lang/ruby/ruby-2.3-stable.tar.gz 
-        dest="{{ src_dir }}"
+        dest=/usr/local/src
+  
+    - name: install nginx
+      yum : name=nginx state=latest
 
     - name   : extract ruby tar  
-      command: tar zxvf "{{ src_dir }}"/ruby-2.3-stable.tar.gz chdir="{{ src_dir }}"
+      command: tar zxvf /usr/local/src/ruby-2.3-stable.tar.gz chdir=/usr/local/src
 
     - name : install ruby
       shell: >
         ./configure --with-opt-dir=/usr/local --enable-shared --enable-option-checking &&
         make &&
         make test &&
-        make install
-        chdir="{{ src_dir }}"/ruby-2.3.1
-        creates="{{ ruby_com_path }}"/ruby
+        make install 
+        chdir=/usr/local/src/ruby-2.3.1 
+        creates=/usr/local/bin/ruby
+
 
     # set up rails
     # specify version
     - name: install rails
-      gem : name=rails version=4.2.7 state=present executable="{{ ruby_com_path }}"/gem user_install=no
-
+      gem:
+        name        : rails
+        version     : 4.2.7
+        state       : present
+        executable  : /usr/local/bin/gem
+        user_install: no
+ 
     - name: install coffee-rails
-      gem : name=coffee-rails version=4.1.0 state=present executable="{{ ruby_com_path }}"/gem user_install=no
+      gem:
+        name        : coffee-rails
+        version     : 4.1.0
+        state       : present
+        executable  : /usr/local/bin/gem
+        user_install: no
 
     - name: install web-console
-      gem : name=web-console version=2.0 state=present executable="{{ ruby_com_path }}"/gem user_install=no
+      gem:
+        name        : web-console
+        version     : 2.0
+        state       : present
+        executable  : /usr/local/bin/gem
+        user_install: no
 
     # install latest gems
     - name: install gems
-      gem : name={{item}} state=latest user_install=no executable="{{ ruby_com_path }}"/gem
+      gem : name={{item}} state=latest user_install=no executable=/usr/local/bin/gem
       with_items: 
         - sqlite3
         - bundler
@@ -124,12 +140,4 @@
         - hirb-unicode
         - mysql2
 
-    # set project app
-    - file: path="{{ project_dir }}" state=directory owner=root group=root mode=0755
-    - git :
-        repo    : "{{ project_repo }}"
-        dest    : "{{ project_dir }}"
-        version : develop
-        clone   : yes
-        update  : yes
 

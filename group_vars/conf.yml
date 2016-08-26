@@ -4,6 +4,10 @@ project_repo : "https://github.com/qeema/rails_projects.git"
 src_dir      : "/usr/local/src"
 ruby_com_path: "/usr/local/bin"
 
+nginx_version: /usr/local/nginx
+nginx_src    : /tmp  
+nginx_install_path: /nginx-1.10.1
+
 
 #mysql_root_passwd: "g34q23t9u@gwea"
 #rails_production_pass: "testteak389@5k93lpdfae"

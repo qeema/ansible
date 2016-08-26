@@ -6,6 +6,14 @@
     -  group_vars/conf.yml
 
   tasks:
+    # set project app
+    - file: path="{{ project_dir }}" state=directory owner=root group=root mode=0755
+    - git :
+        repo    : "{{ project_repo }}"
+        dest    : "{{ project_dir }}"
+        version : develop
+        clone   : yes
+        update  : yes
 
     # setting unicorn
     - name: unicorn socket directory
@@ -18,7 +26,7 @@
       command: mv /tmp/unicorn.rb.j2 "{{ project_dir }}"/config/unicorn.rb
 
     - name   : start unicorn
-      command: cd "{{ project_dir }}" ; unicorn_rails -c config/unicorn.rb -E development -D
+      shell  : /usr/local/bin/unicorn_rails -c "{{ project_dir }}"/config/unicorn.rb -E development -D
 
     # setting nginx
     # check if exist defaul conf
@@ -42,5 +50,5 @@
     # start rails app
     # over 51840 min killing process
     - name   : start rails project!
-      command: /usr/local/bin/ruby /vagrant/rails_projects/bin/rails s -b 0.0.0.0
+      command: /usr/local/bin/ruby "{{ project_dir }}"/bin/rails s -b 0.0.0.0
       async  : 51840 
