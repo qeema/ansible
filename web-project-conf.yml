@@ -1,0 +1,54 @@
+- name: Configure rails webserver
+  hosts: webserver
+  become: True
+
+  vars_files:
+    -  group_vars/conf.yml
+
+  tasks:
+    # set project app
+    - file: path="{{ project_dir }}" state=directory owner=root group=root mode=0755
+    - git :
+        repo    : "{{ project_repo }}"
+        dest    : "{{ project_dir }}"
+        version : develop
+        clone   : yes
+        update  : yes
+
+    # setting unicorn
+    - name: unicorn socket directory
+      file: path=/var/run/unicorn state=directory owner=root group=root mode=0777
+
+    - name    : copy unicorn template file
+      template: src=templates/unicorn.rb.j2 dest=/tmp
+
+    - name   : move unicorn.j2 to unicorn.rb
+      command: mv /tmp/unicorn.rb.j2 "{{ project_dir }}"/config/unicorn.rb
+
+    - name   : start unicorn
+      shell  : /usr/local/bin/unicorn_rails -c "{{ project_dir }}"/config/unicorn.rb -E development -D
+
+    # setting nginx
+    # check if exist defaul conf
+    - name    : register stat nginx conf
+      stat    : path=/etc/nginx/conf.d/default.conf
+      register: nginx_stat
+
+    - name   : move nginx default conf to bk
+      command: mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/_default.conf.bk
+      when   : nginx_stat.stat.exists
+
+    - name    : copy nginx template file
+      template: src=templates/nginx.conf.j2 dest=/tmp
+
+    - name   : move nginx conf to default conf
+      command: mv /tmp/nginx.conf.j2 /etc/nginx/conf.d/nginx.conf
+
+    - name   : start nginx
+      service: name=nginx state=started enabled=yes
+
+    # start rails app
+    # over 51840 min killing process
+    - name   : start rails project!
+      command: /usr/local/bin/ruby "{{ project_dir }}"/bin/rails s -b 0.0.0.0
+      async  : 51840 

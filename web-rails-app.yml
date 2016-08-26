@@ -1,19 +1,16 @@
-- name: Configure rails webserver
-  hosts: webserver
+---
+- name  : Configure Rails Webserver
+  hosts : webserver
   become: True
-  vars:
-    - project_dir: "/vagrant/rails_projects"
-    - project_repo: "https://github.com/qeema/rails_projects.git"
+
+  # ansible vars = "{{ foo }}"
+  vars_files:
+    -  group_vars/conf.yml
+
+  # set up ansible tasks
   tasks:
-    - name: install git
-      yum : name=git
 
-    - name: install tmux
-      yum : name=tmux
-
-    - name: install node.js
-      yum : name=nodejs
-
+    # set up required env
     - name : set locale lang
       shell: |
         localectl set-locale LANG=ja_JP.utf8
@@ -22,7 +19,8 @@
     - name : set timezone
       shell: timedatectl set-timezone Asia/Tokyo
 
-    - yum: name={{item}} state=latest
+    - name: install softs 
+      yum : name={{item}} state=latest
       with_items:
         - wget
         - unzip
@@ -33,67 +31,78 @@
         - zlib-devel
         - readline-devel
         - sqlite-devel
+        - ruby-devel
+        - git
+        - tmux
+        - nodejs
+        - zsh
 
-    # set project app
-    - file: path="{{ project_dir }}" state=directory owner=root group=root mode=0755
-    - git:
-        repo: "{{ project_repo }}"
-        dest: "{{ project_dir }}"
-        version: develop
-        clone: yes
-        update: yes
+    - name : set default shell
+      shell: chsh -s '/bin/zsh' root
 
-    # install ruby
-    - get_url: >
+    # set up mysql
+    - name : add mysql repo
+      shell: |
+            rpm -ih http://dev.mysql.com/get/mysql57-community-release-el7-7.noarch.rpm
+            creates=/etc/yum.repos.d/mysql-community.repo
+
+    - name: install mysql
+      yum : name={{item}} state=present enablerepo=mysql56-community
+      with_items:
+        - mysql-community-server
+        - mysql-community-client
+        - mysql-community-common
+        - mysql-community-libs
+        - mysql-community-libs-compat
+        - mysql-devel
+        - MySQL-python
+
+    - name   : start server
+      service: name=mysqld state=started enabled=yes
+
+    # TODO  should use secure_instalation
+    - name    : first root password
+      shell   : cat /var/log/mysqld.log | grep password | awk '{ print $NF }' | head -n 1
+      register: mysql_passwd
+
+    # set up nginx
+    - name : add nginx repo
+      shell: |
+        rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+
+    # set up ruby
+    - name: get ruby url
+      get_url: >
         url=http://core.ring.gr.jp/pub/lang/ruby/ruby-2.3-stable.tar.gz 
-        dest=/usr/local/src/
-    - command: tar zxvf /usr/local/src/ruby-2.3-stable.tar.gz chdir=/usr/local/src
-    - shell: >
+        dest=/usr/local/src
+  
+    - name: install nginx
+      yum : name=nginx state=latest
+
+    - name   : extract ruby tar  
+      command: tar zxvf /usr/local/src/ruby-2.3-stable.tar.gz chdir=/usr/local/src
+
+    - name : install ruby
+      shell: >
         ./configure --with-opt-dir=/usr/local --enable-shared --enable-option-checking &&
         make &&
         make test &&
-        make install
-        chdir=/usr/local/src/ruby-2.3.1
+        make install 
+        chdir=/usr/local/src/ruby-2.3.1 
         creates=/usr/local/bin/ruby
 
-    # install rails
-    - name: Install rails
+
+    # set up rails
+    # specify version
+    - name: install rails
       gem:
         name        : rails
         version     : 4.2.7
         state       : present
         executable  : /usr/local/bin/gem
         user_install: no
-
-    - name: Install sqlite3
-      gem:
-        name        : sqlite3
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
-
-    - name: Install bundler
-      gem:
-        name        : bundler
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
-
-    - name: Install sass-rails
-      gem:
-        name        : sass-rails
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
-
-    - name: Install uglifier
-      gem:
-        name        : uglifier
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
-
-    - name: Install coffee-rails
+ 
+    - name: install coffee-rails
       gem:
         name        : coffee-rails
         version     : 4.1.0
@@ -101,42 +110,7 @@
         executable  : /usr/local/bin/gem
         user_install: no
 
-    - name: Install jquery-rails
-      gem:
-        name        : jquery-rails
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
-
-    - name: Install turbolinks
-      gem:
-        name        : turbolinks
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
-
-    - name: Install sdoc
-      gem:
-        name        : sdoc
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
-
-    - name: Install unicorn
-      gem:
-        name        : unicorn
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
-
-    - name: Install byebug
-      gem:
-        name        : byebug
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
-
-    - name: Install web-console
+    - name: install web-console
       gem:
         name        : web-console
         version     : 2.0
@@ -144,51 +118,26 @@
         executable  : /usr/local/bin/gem
         user_install: no
 
-    - name: Install spring
-      gem:
-        name        : spring
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
+    # install latest gems
+    - name: install gems
+      gem : name={{item}} state=latest user_install=no executable=/usr/local/bin/gem
+      with_items: 
+        - sqlite3
+        - bundler
+        - sass-rails
+        - uglifier
+        - jquery-rails
+        - turbolinks
+        - sdoc
+        - unicorn
+        - byebug
+        - spring
+        - jbuilder
+        - therubyracer
+        - pry-rails
+        - pry-byebug
+        - hirb
+        - hirb-unicode
+        - mysql2
 
-    - name: Install jbuilder
-      gem:
-        name        : jbuilder
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
 
-    - name: Install therubyracer
-      gem:
-        name        : therubyracer
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
-
-    - name: Install pry rails
-      gem:
-        name        : pry-rails
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
-
-    - name: Install pry byebye bug
-      gem:
-        name        : pry-byebug
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
-
-    - name: Install hirb
-      gem:
-        name        : hirb
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
-
-    - name: Install hirb-uni
-      gem:
-        name        : hirb-unicode
-        state       : latest
-        executable  : /usr/local/bin/gem
-        user_install: no
