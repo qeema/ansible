@@ -20,14 +20,8 @@
 		- IPアドレスを対象サーバーに指定する
 	- ansible.cfg
 		- remote_userを対象サーバのユーザー名に変更
-	- web-rails-app.yml
-		- rails用サーバー基本設定
-	- web-project-conf.yml
-		- app repo設置+conf設定
 	- group_vars/conf.yml
-		- 共通変数
-	- template/foo.j2
-		- conf用テンプレート
+		- リポジトリ等
 3. 実行サーバーにてansibleコマンド実行
 	- `$ ansible-playbook web-rails-app.yml`
 4. failedが出なければ成功。rubyインストールなので結構遅い
