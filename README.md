@@ -9,7 +9,7 @@
 - vagrant 1.8+
 - CentOS  7.1+
 - Ansible 2.0+
-	- `yum install ansible --enablerepo=epel-testing -y`
+	- `$ yum install ansible --enablerepo=epel-testing -y`
 
 ## Usage
 1. ansible実行サーバーと対象サーバーを準備。対象は実行サーバーでもよい
@@ -24,6 +24,7 @@
 		- リポジトリ等
 3. 実行サーバーにてansibleコマンド実行
 	- `$ ansible-playbook web-rails-app.yml`
+	- `$ ansible-playbook web-project-conf.yml`
 4. failedが出なければ成功。rubyインストールなので結構遅い
 5. serverspec当てて動作確認 => https://github.com/qeema/serverspec
 
