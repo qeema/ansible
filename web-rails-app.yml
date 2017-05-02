@@ -11,10 +11,10 @@
   tasks:
 
     # set up required env
-    - name : set locale lang
-      shell: |
-        localectl set-locale LANG=ja_JP.utf8
-        source /etc/locale.conf
+#    - name : set locale lang
+#      shell: |
+#        localectl set-locale LANG=en_US.utf8
+#        source /etc/locale.conf
     
     - name : set timezone
       shell: timedatectl set-timezone Asia/Tokyo
@@ -35,10 +35,9 @@
         - git
         - tmux
         - nodejs
-        - zsh
 
-    - name : set default shell
-      shell: chsh -s '/bin/zsh' root
+    #- name : set default shell
+    #  shell: chsh -s '/bin/zsh' root
 
     # set up mysql
     - name : add mysql repo
@@ -66,21 +65,21 @@
       register: mysql_passwd
 
     # set up nginx
-    - name : add nginx repo
-      shell: |
-        rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+    #- name : add nginx repo
+    #  shell: |
+    #    rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
 
     # set up ruby
     - name: get ruby url
       get_url: >
-        url=http://core.ring.gr.jp/pub/lang/ruby/ruby-2.3-stable.tar.gz 
+        url=http://core.ring.gr.jp/pub/lang/ruby/ruby-2.4-stable.tar.gz 
         dest=/usr/local/src
   
     - name: install nginx
       yum : name=nginx state=latest
 
     - name   : extract ruby tar  
-      command: tar zxvf /usr/local/src/ruby-2.3-stable.tar.gz chdir=/usr/local/src
+      command: tar zxvf /usr/local/src/ruby-2.4-stable.tar.gz chdir=/usr/local/src
 
     - name : install ruby
       shell: >
@@ -88,7 +87,7 @@
         make &&
         make test &&
         make install 
-        chdir=/usr/local/src/ruby-2.3.1 
+        chdir=/usr/local/src/ruby-2.4.1
         creates=/usr/local/bin/ruby
 
     # set up rails
@@ -96,7 +95,7 @@
     - name: install rails
       gem:
         name        : rails
-        version     : 4.2.7
+        version     : 5.1.0
         state       : present
         executable  : /usr/local/bin/gem
         user_install: no
